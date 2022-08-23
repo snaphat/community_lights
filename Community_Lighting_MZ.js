@@ -879,9 +879,9 @@ Imported[Community.Lighting.name] = true;
 		return result;
 	};
 
-	Number.prototype.includes = function() {
+	Number.prototype.includes = function () {
 		return [...arguments].includes(Number(this));
-	}
+	};
 
 	const Boolean = {
 		false : false, "false" : false,
@@ -898,7 +898,7 @@ Imported[Community.Lighting.name] = true;
 		Glow        : 6, "glow"        : 6, "6" : 6, 6 : 6,
 		GlowA       : 7, "glowa"       : 7, "7" : 7, 7 : 7,
 		END         : 8
-	}
+	};
 
 	const TileType = {
 		Terrain : 0, "terrain" : 0, "0" : 0, 0 : 0,
@@ -2762,7 +2762,7 @@ Imported[Community.Lighting.name] = true;
 				if (r2 < 0) r2 = 0;
 			}
 
-			grad = contextMultiply.createRadialGradient(x1, y1, r1, x1, y1, r2);
+			let grad = contextMultiply.createRadialGradient(x1, y1, r1, x1, y1, r2);
 			if (brightness) {
 				grad.addColorStop(0, '#FFFFFF');
 			}
@@ -2843,7 +2843,7 @@ Imported[Community.Lighting.name] = true;
 
 		r1 = 1;
 		r2 = 40;
-		grad = contextMultiply.createRadialGradient(x1, y1, r1, x1, y1, r2);
+		let grad = contextMultiply.createRadialGradient(x1, y1, r1, x1, y1, r2);
 		grad.addColorStop(0, color1);
 		grad.addColorStop(1, color2);
 
