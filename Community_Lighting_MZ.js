@@ -15,7 +15,7 @@ Imported[Community.Lighting.name] = true;
 * @target MZ
 * @plugindesc v4.6 Creates an extra layer that darkens a map and adds lightsources! Released under the MIT license!
 * @author Terrax, iVillain, Aesica, Eliaquim, Alexandre, Nekohime1989
-7
+*
 * @param ---General Settings---
 * @default
 *
@@ -87,7 +87,6 @@ Imported[Community.Lighting.name] = true;
 * @type number
 * @min 0
 * @default 10
-*
 *
 * @param Save DaynightHours
 * @parent ---DayNight Settings---
@@ -659,12 +658,12 @@ Imported[Community.Lighting.name] = true;
 * @help
 *
 * --------------------------------------------------------------------------
-* Important info about note tags and the note tag key plugin paramter:
+* Important info about note tags and the note tag key plugin parameter:
 *
 * 1. This plugin features an optional note tag key that lets this plugin's
 * note tags work alongside those of other plugins--a feature not found in the
 * original Terrax Lighting plugin. If a note tag key is set in the plugin
-* paramters, all of these commands must be enclosed in a note tag with that
+* parameters, all of these commands must be enclosed in a note tag with that
 * particular key in in order to be recognized.
 *
 * This note tag key applies to anything this plugin would have placed inside
@@ -684,7 +683,7 @@ Imported[Community.Lighting.name] = true;
 *
 * Using a note tag key is recommended since it allows for other things
 * (plugins, or even your own personal notes) to make use of the note box
-* without breaking things.  Omiting the key is intended primarily as legacy
+* without breaking things. Omitting the key is intended primarily as legacy
 * support, allowing this plugin to be used with older projects that have
 * been upgraded from Terrax Lighting so you don't have to go back and
 * change a bunch of event and map notes.
@@ -760,15 +759,15 @@ Imported[Community.Lighting.name] = true;
 * Flashlight [bl] [bw] [c] [onoff] [sdir] [x] [y] [id]
 * - Sets the light as a flashlight with beam length (bl) beam width (bw) color (c),
 *      0|1 (onoff), and 1=up, 2=right, 3=down, 4=left for static direction (sdir)
-* - bl:       Beam length:  Any number, optionally preceeded by "L", so 8, L8
-* - bw:       Beam width:  Any number, optionally preceeded by "W", so 12, W12
+* - bl:       Beam length:  Any number, optionally preceded by "L", so 8, L8
+* - bw:       Beam width:  Any number, optionally preceded by "W", so 12, W12
 * - cycle     Allows any number of color + duration pairs to follow that will be
 *             cycled through before repeating from the beginning:
 *             <cl: Flashlight l8 w12 cycle #f00 15 #ff0 15 #0f0 15 on someId d3>
 *             There's no limit to how many colors can be cycled. [optional]
 * - onoff:    Initial state:  0, 1, off, on
 * - sdir:     Forced direction (optional): 0:auto, 1:up, 2:right, 3:down, 4:left
-*             Can be preceeded by "D", so D4.  If omitted, defaults to 0
+*             Can be preceded by "D", so D4.  If omitted, defaults to 0
 * - x         x[offset] Work the same as regular light [optional]
 * - y         y[offset] [optional]
 * - day       Sets the event's light to only show during the day [optional]
@@ -811,7 +810,7 @@ Imported[Community.Lighting.name] = true;
 *
 * If the 'Kill Switch Auto' parameter has been set to true, any event with
 * a (non) active conditional light have their killswitch locked to ON(OFF).
-* You can use this difference to give alternate apparences to these events.
+* You can use this difference to give alternate appearances to these events.
 * For example, a conditional light event can have a page where it shows a
 * burning candle, and second page (active only when the kill switch is ON)
 * who shows an unlit candle
@@ -2662,6 +2661,14 @@ Imported[Community.Lighting.name] = true;
 
 	// *******************  NORMAL BOX SHAPE ***********************************
 
+	/**
+	*
+	* @param {Number} x1
+	* @param {Number} y1
+	* @param {Number} x2
+	* @param {Number} y2
+	* @param {String} color1
+	*/
 	Bitmap.prototype.FillRect = function (x1, y1, x2, y2, color1) {
 		x1 = x1 + lightMaskPadding;
 		//x2=x2+lightMaskPadding;
@@ -2675,6 +2682,13 @@ Imported[Community.Lighting.name] = true;
 
 	// *******************  CIRCLE/OVAL SHAPE ***********************************
 	// from http://scienceprimer.com/draw-oval-html5-canvas
+	/**
+	* @param {Number} centerX
+	* @param {Number} centerY
+	* @param {Number} xradius
+	* @param {Number} yradius
+	* @param {String} color1
+	*/
 	Bitmap.prototype.FillCircle = function (centerX, centerY, xradius, yradius, color1) {
 		centerX = centerX + lightMaskPadding;
 
@@ -2703,7 +2717,19 @@ Imported[Community.Lighting.name] = true;
 
 	// *******************  NORMAL LIGHT SHAPE ***********************************
 	// Fill gradient circle
-
+	/**
+	*
+	* @param {Number} x1
+	* @param {Number} y1
+	* @param {Number}  r1
+	* @param {Number} r2
+	* @param {String} color1
+	* @param {String} color2
+	* @param {Boolean} flicker
+	* @param {Number} brightness
+	* @param {Number} direction
+	* @param {Boolean} enableAdditive
+	*/
 	Mask_Bitmaps.prototype.radialgradientFillRect = function (x1, y1, r1, r2, color1, color2, flicker, brightness, direction, enableAdditive=false) {
 
 		//color1 = $$.validateColor(color1);
@@ -2826,12 +2852,21 @@ Imported[Community.Lighting.name] = true;
 
 	// ********************************** FLASHLIGHT *************************************
 	// Fill gradient Cone
-
+	/**
+	*
+	* @param {Number} x1
+	* @param {Number} y1
+	* @param {Number} r1
+	* @param {Number} r2
+	* @param {String} color1
+	* @param {String} color2
+	* @param {Number} direction
+	* @param {Number} flashlength
+	* @param {Number} flashwidth
+	* @param {Boolean} enableAdditive
+	*/
 	Mask_Bitmaps.prototype.radialgradientFillRect2 = function (x1, y1, r1, r2, color1, color2, direction, flashlength, flashwidth, enableAdditive=false) {
 		x1 = x1 + lightMaskPadding;
-
-		//color1 = $$.validateColor(color1);
-		//color2 = $$.validateColor(color2);
 
 		let contextMultiply = this.multiply._context;
 		let contextAdditive = this.additive._context;
@@ -2896,7 +2931,11 @@ Imported[Community.Lighting.name] = true;
 		//this._setDirty();
 	};
 
-
+	/**
+	*
+	* @param {String} hex
+	* @returns {{r:number,g:number,b:number}}
+	*/
 	$$.hexToRgb = function(hex) {
 		let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 		result = result ? {
@@ -3088,8 +3127,7 @@ Imported[Community.Lighting.name] = true;
 	// ALLIASED Move event location => reload map.
 
 	$$.Game_Interpreter_command203 = Game_Interpreter.prototype.command203;
-	Game_Interpreter.prototype.command203 = function(params)
-	{
+	Game_Interpreter.prototype.command203 = function(params) {
 		$$.Game_Interpreter_command203.call(this, params);
 		$$.ReloadMapEvents();
 		return true;
