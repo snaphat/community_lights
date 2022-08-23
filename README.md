@@ -143,8 +143,14 @@ You can post your questions on the related thread on rpgmakerweb: https://forums
 	* - y           y offset [optional]
 	* - id          1, 2, 2345, etc--an id number for plugin commands [optional]
 	*
+	* Lighta ...params
+	* - Same as Light params above, but adds an additive lighting effect.
+	*
 	* Fire ...params
 	* - Same as Light params above, but adds a subtle flicker
+	*
+	* Firea ...params
+	* - Same as Light params above, but adds a subtle flicker and additive lighting effect.
 	*
 	* Flashlight [bl] [bw] [c] [onoff] [sdir] [x] [y] [id]
 	* - Sets the light as a flashlight with beam length (bl) beam width (bw) color (c),
@@ -165,6 +171,9 @@ You can post your questions on the related thread on rpgmakerweb: https://forums
 	* - id        1, 2, potato, etc. An id (alphanumeric) for plugin commands [optional]
 	*             Those should not begin with 'd', 'x' or 'y' otherwise
 	*             they will be mistaken for one of the previous optional parameters.
+	*
+	* Flashlighta ...params
+	* - Same as Flashlight params above, but adds an additive lighting effect.
 	*
 	* Example note tags:
 	*
