@@ -53,12 +53,6 @@ Imported[Community.Lighting.name] = true;
 * @type boolean
 * @default false
 *
-* @param Triangular flashlight
-* @parent ---General Settings---
-* @desc Alternative triangular flashlight beam
-* @type boolean
-* @default false
-*
 * @param Shift lights with events
 * @parent ---General Settings---
 * @desc Should a light be shifted 6 pixel up if its associated event does?
@@ -378,6 +372,12 @@ Imported[Community.Lighting.name] = true;
 *               otherwise it will be mistaken for one of the previous optional parameters.
 *               Generally, it is adviseable to avoid any single letter followed by a number.
 *
+* Conelight ...params
+* - Same as Flashlight params above, but is a cone shape.
+*
+* Spotlight ...params
+* - Same as Flashlight params above, but is a cone shape with a spot.
+*
 * Example note tags:
 *
 * <cl: light 250 #ffffff>
@@ -415,6 +415,14 @@ Imported[Community.Lighting.name] = true;
 * <cl: Flashlight l8 w12 cycle #f00 15 #ff0 15 #0f0 15>
 * <cl: Flashlight l8 w12 {#f00 p15} {#ff0} {#0f0}>
 * Creates a flashlight beam that rotates every 15 frames.
+*
+* <cl: Conelight l8 w12 cycle #f00 15 #ff0 15 #0f0 15>
+* <cl: Conelight l8 w12 {#f00 p15} {#ff0} {#0f0}>
+* Creates a conelight beam that rotates every 15 frames.
+*
+* <cl: Spotlight l8 w12 cycle #f00 15 #ff0 15 #0f0 15>
+* <cl: Spotlight l8 w12 {#f00 p15} {#ff0} {#0f0}>
+* Creates a spotlight beam that rotates every 15 frames.
 *
 * --------------------------------------------------------------------------
 * Additive Lighting Effects
@@ -603,9 +611,10 @@ Imported[Community.Lighting.name] = true;
 * Setfire r s
 * - Alters fire settings with radius shift (r) and red/yellow color shift (s)
 *
-* Flashlight on bl bw c bd
+* Flashlight on bl bw c bd [t]
 * - turn on flashlight for player with beam length (bl), beam width (hw), color (c),
-*   and beam density (bd)
+*   and beam density (bd) and optional type (t) where 0 = flashlight (default),
+*   1 = conelight, and 2 = spotlight.
 *
 * Flashlight off
 * - Turn off the flashlight.  yup.
@@ -818,7 +827,18 @@ const LightType = {
   Light     : 1, light     : 1, 1: 1,
   Fire      : 2, fire      : 2, 2: 2,
   Flashlight: 3, flashlight: 3, 3: 3,
-  Glow      : 4, glow      : 4, 4: 4
+  Conelight : 4, conelight : 4, 4: 4,
+  Spotlight : 5, spotlight : 5, 5: 5,
+  Glow      : 6, glow      : 6, 6: 6
+};
+
+const FlashlightTypeMap = { // for mapping command id to internal type
+  Flashlight: 0, flashlight: 0,
+  Conelight : 1, conelight : 1,
+  Spotlight : 2, spotlight : 2,
+  0: LightType.Flashlight,
+  1: LightType.Conelight,
+  2: LightType.Spotlight
 };
 
 const TileLightType = {
@@ -1051,7 +1071,7 @@ class LightProperties {
   /**
    * Returns true if the light type is a flashlight or null; otherwise false.
    */
-  isFlashlight() { return this.type == null || this.type.is(LightType.Flashlight); }
+  isFlashlight() { return this.type == null || this.type.is(LightType.Flashlight, LightType.Conelight, LightType.Spotlight); }
 
   /**
    * Returns true if the light type is light, fire, glow, or null; otherwise false.
@@ -1527,9 +1547,7 @@ class ColorDelta {
   let lightMaskPadding          = +parameters["Lightmask Padding"] || 0;
   let useSmootherLights         = orBoolean(parameters['Use smoother lights'], false);
   let light_event_required      = orBoolean(parameters["Light event required"], false);
-  let triangular_flashlight     = orBoolean(parameters["Triangular flashlight"], false);
   let shift_lights_with_events  = orBoolean(parameters['Shift lights with events'], false);
-  let player_radius             = +parameters['Player radius'] || 0;
   let reset_each_map            = orBoolean(parameters['Reset Lights'], false);
   let noteTagKey                = parameters["Note Tag Key"] !== "" ? parameters["Note Tag Key"] : false;
   let dayNightSaveSeconds       = +parameters['Save DaynightSeconds'] || 0;
@@ -1677,7 +1695,7 @@ class ColorDelta {
     this._cl.type = LightType[tagData.shift()];
     // Handle parsing of light, fire, and flashlight
     if (this._cl.type) {
-      let isFL       = ()             => this._cl.type.is(LightType.Flashlight); // is flashlight
+      let isFL       = ()             => this._cl.type.is(LightType.Flashlight, LightType.Conelight, LightType.Spotlight);
       let isEq       = (e, s0, s1)    => s0 && e.equalsIC(s0)     || s1 && e.equalsIC(s1);
       let isPre      = (e, p0, p1)    => p0 && e.startsWithIC(p0) || p1 && e.startsWithIC(p1);
       let isPreNum   = (e, p, n0, n1) => p && e.startsWithIC(p) && !isNaN(n0) && (n1 == void (0) || !isNaN(n1));
@@ -1864,7 +1882,7 @@ class ColorDelta {
     r("setHoursInDay",      function (a) { $$.interpreter = this; f("dayNight",   ["hoursinday", a.hours, dayMode(a)]); });
     r("showTime",           function (a) { $$.interpreter = this; f("dayNight",   [showMode(a)]); });
     r("setHourColor",       function (a) { $$.interpreter = this; f("dayNight",   ["color", a.hour, a.color, dayMode(a)]); });
-    r("flashlight",         function (a) { $$.interpreter = this; f("flashLight", [mapOnOff(a), a.beamLength, a.beamWidth, a.color, a.density]); });
+    r("flashlight",         function (a) { $$.interpreter = this; f("flashLight", [mapOnOff(a), a.beamLength, a.beamWidth, a.color, a.density, FlashlightTypeMap[a.type]]); });
     r("setFire",            function (a) { $$.interpreter = this; f("setFire",    [a.radiusShift, a.redYellowShift]); });
     r("playerLightRadius",  function (a) { $$.interpreter = this; f("light",      [radMode(a), a.radius, a.color, "B" + a.brightness, a.fadeSpeed]); });
     r("activateById",       function (a) { $$.interpreter = this; f("light",      [mapOnOff(a), a.id]); });
@@ -2067,10 +2085,11 @@ class ColorDelta {
     this._addSprite(-lightMaskPadding, 0, this._maskBitmaps.additive, PIXI.BLEND_MODES.ADD);
 
     // ******** GROW OR SHRINK GLOBE PLAYER *********
+    let player_radius;
     let firstrun = $gameVariables.GetFirstRun();
     if (firstrun === true) {
       $gameVariables.SetFirstRun(false);
-      player_radius = +parameters['Player radius'];
+      player_radius = orNaN(+parameters['Player radius'], 0);
       $gameVariables.SetRadius(player_radius);
     } else {
       player_radius = $gameVariables.GetRadius();
@@ -2111,16 +2130,17 @@ class ColorDelta {
       y1 = (ph / 2) + (yjump * ph);
     }
 
-    let playerflashlight = $gameVariables.GetFlashlight();
-    let playercolor      = $gameVariables.GetPlayerColor();
-    let flashlightlength = $gameVariables.GetFlashlightLength();
-    let flashlightwidth  = $gameVariables.GetFlashlightWidth();
-    let playerflicker    = $gameVariables.GetFire();
-    let playerbrightness = $gameVariables.GetPlayerBrightness();
-    let iplayer_radius   = Math.floor(player_radius);
+    let playerflashlight     = $gameVariables.GetFlashlight();
+    let playerFlashlightType = $gameVariables.GetFlashlightType();
+    let playercolor          = $gameVariables.GetPlayerColor();
+    let flashlightlength     = $gameVariables.GetFlashlightLength();
+    let flashlightwidth      = $gameVariables.GetFlashlightWidth();
+    let playerflicker        = $gameVariables.GetFire();
+    let playerbrightness     = $gameVariables.GetPlayerBrightness();
+    let iplayer_radius       = Math.floor(player_radius);
 
     if (playerflashlight == true) {
-      this._maskBitmaps.radialgradientFlashlight(x1, y1, playercolor, pd, flashlightlength, flashlightwidth);
+      this._maskBitmaps.radialgradientFlashlight(x1, y1, playercolor, pd, flashlightlength, flashlightwidth, playerFlashlightType);
     }
     if (iplayer_radius > 0) {
       x1 = x1 - flashlightXoffset;
@@ -2226,12 +2246,12 @@ class ColorDelta {
           lx1 += +xOffset;
           ly1 += +yOffset;
 
-          if (lightType.is(LightType.Flashlight)) {
+          if (lightType.is(LightType.Flashlight, LightType.Conelight, LightType.Spotlight)) {
             let ldir = RMDirectionMap[events[event_stacknumber[i]]._direction] || 0;
             let flashlength = cur.getLightFlashlightLength();
             let flashwidth  = cur.getLightFlashlightWidth();
             if (!isNaN(direction)) ldir = direction;
-            this._maskBitmaps.radialgradientFlashlight(lx1, ly1, color, ldir, flashlength, flashwidth);
+            this._maskBitmaps.radialgradientFlashlight(lx1, ly1, color, ldir, flashlength, flashwidth, lightType);
           } else if (lightType.is(LightType.Light, LightType.Fire)) {
             let xRadius = cur.getLightXRadius();
             let yRadius = cur.getLightYRadius();
@@ -2649,7 +2669,7 @@ class ColorDelta {
    * @param {Number} flashlength
    * @param {Number} flashwidth
    */
-  Mask_Bitmaps.prototype.radialgradientFlashlight = function (x, y, c, dirAngle, flashlength, flashwidth) {
+  Mask_Bitmaps.prototype.radialgradientFlashlight = function (x, y, c, dirAngle, flashlength, flashwidth, lightType) {
     x = x + lightMaskPadding;
     x = x - flashlightXoffset;
     y = y - flashlightYoffset;
@@ -2672,7 +2692,7 @@ class ColorDelta {
     let flashlightdensity = $gameVariables.GetFlashlightDensity();
     if (flashlightdensity >= flashwidth) flashlightdensity = flashwidth - 1;
 
-    if (triangular_flashlight) { // Triangular flashlight
+    if (lightType.is(LightType.Conelight, LightType.Spotlight)) {
       // Compute distance to spot and flashlight density
       let distance = 3 * (flashlength * (flashlength - 1));
 
@@ -2694,7 +2714,7 @@ class ColorDelta {
 
       // Compute beam distance
       let endPointDistance = distance - r2 / 2;
-      let endCtrlPointDistance = distance + 1.6 * r2;
+      let endCtrlPointDistance = distance + (lightType.is(LightType.Conelight) ? 0.8 : 1.6) * r2;
 
       // Compute beam width based off of angle (for drawing beam)
       let beamWidth = Math.atan(0.80 * r2 / distance); // 70% of spot outer radius.
@@ -2780,22 +2800,26 @@ class ColorDelta {
       x += distance * Math.cos(dirAngle);
       y += distance * Math.sin(dirAngle);
 
-      // Draw spot
-      grad = ctxMul.createRadialGradient(x, y, r1, x, y, r2);
-      grad.addTransparentColorStops(0, c);
-      ctxMul.shadowColor = "#000000"; // Clear shadow style outside of check as ctxMul state changes always occur
+      // Clear shadow style
+      ctxMul.shadowColor = "#000000";
       ctxMul.shadowBlur = 0;
-      if (!c.v) {
-        ctxMul.fillStyle = grad;
-        ctxMul.fillRect(x - r2, y - r2, r2 * 2, r2 * 2);
-        ctxMul.fillRect(x - r2, y - r2, r2 * 2, r2 * 2);
-      } else {
-        ctxAdd.shadowColor = "#000000"; // Clear shadow style inside of check as ctxAdd state changes are conditional
-        ctxAdd.shadowBlur = 0;
-        ctxAdd.fillStyle = grad;
-        ctxAdd.fillRect(x - r2, y - r2, r2 * 2, r2 * 2); // single call as to not blur things so much.
+      ctxAdd.shadowColor = "#000000";
+      ctxAdd.shadowBlur = 0;
+
+      if (lightType.is(LightType.Spotlight)) {
+        // Draw spot
+        grad = ctxMul.createRadialGradient(x, y, r1, x, y, r2);
+        grad.addTransparentColorStops(0, c);
+        if (!c.v) {
+          ctxMul.fillStyle = grad;
+          ctxMul.fillRect(x - r2, y - r2, r2 * 2, r2 * 2);
+          ctxMul.fillRect(x - r2, y - r2, r2 * 2, r2 * 2);
+        } else {
+          ctxAdd.fillStyle = grad;
+          ctxAdd.fillRect(x - r2, y - r2, r2 * 2, r2 * 2); // single call as to not blur things so much.
+        }
       }
-    } else { // Circular flashlight
+    } else if (lightType.is(LightType.flashlight)) { // Circular flashlight
       // Compute diagonal length scalars.
       let xScalar = Math.cos(dirAngle);
       let yScalar = Math.sin(dirAngle);
@@ -3143,10 +3167,11 @@ class ColorDelta {
   $$.flashlight = function (args) {
     if (isOn(args[0])) {
       $gameVariables.SetFlashlight(true);
-      $gameVariables.SetFlashlightLength(args[1]);  // cond set
-      $gameVariables.SetFlashlightWidth(args[2]);   // cond set
-      $gameVariables.SetPlayerColor(args[3]);       // cond set
-      $gameVariables.SetFlashlightDensity(args[4]); // cond set
+      $gameVariables.SetFlashlightLength(args[1]);   // cond set
+      $gameVariables.SetFlashlightWidth(args[2]);    // cond set
+      $gameVariables.SetPlayerColor(args[3]);        // cond set
+      $gameVariables.SetFlashlightDensity(args[4]);  // cond set
+      $gameVariables.SetFlashlightType(FlashlightTypeMap[args[5]]);
     } else if (isOff(args[0])) {
       $gameVariables.SetFlashlight(false);
     }
@@ -3400,6 +3425,12 @@ Game_Variables.prototype.SetFlashlight = function (value) {
 };
 Game_Variables.prototype.GetFlashlight = function () {
   return orNullish(this._Community_Lighting_Flashlight, false);
+};
+Game_Variables.prototype.SetFlashlightType = function (value) {
+  this._Community_Lighting_FlashlightType = value;
+};
+Game_Variables.prototype.GetFlashlightType = function () {
+  return orNaN(this._Community_Lighting_FlashlightType, LightType.Flashlight);
 };
 Game_Variables.prototype.SetFlashlightDensity = function (value) { // don't set if invalid or 0
   if (+value > 0) this._Community_Lighting_FlashlightDensity = +value;

@@ -192,6 +192,12 @@ You can post your questions on the related thread on rpgmakerweb: https://forums
 	*               otherwise it will be mistaken for one of the previous optional parameters.
 	*               Generally, it is adviseable to avoid any single letter followed by a number.
 	*
+	* Conelight ...params
+	* - Same as Flashlight params above, but is a cone shape.
+	*
+	* Spotlight ...params
+	* - Same as Flashlight params above, but is a cone shape with a spot.
+	*
 	* Example note tags:
 	*
 	* <cl: light 250 #ffffff>
@@ -229,6 +235,14 @@ You can post your questions on the related thread on rpgmakerweb: https://forums
 	* <cl: Flashlight l8 w12 cycle #f00 15 #ff0 15 #0f0 15>
 	* <cl: Flashlight l8 w12 {#f00 p15} {#ff0} {#0f0}>
 	* Creates a flashlight beam that rotates every 15 frames.
+	*
+	* <cl: Conelight l8 w12 cycle #f00 15 #ff0 15 #0f0 15>
+	* <cl: Conelight l8 w12 {#f00 p15} {#ff0} {#0f0}>
+	* Creates a conelight beam that rotates every 15 frames.
+	*
+	* <cl: Spotlight l8 w12 cycle #f00 15 #ff0 15 #0f0 15>
+	* <cl: Spotlight l8 w12 {#f00 p15} {#ff0} {#0f0}>
+	* Creates a spotlight beam that rotates every 15 frames.
 	*
 	* --------------------------------------------------------------------------
 	* Additive Lighting Effects
@@ -417,9 +431,10 @@ You can post your questions on the related thread on rpgmakerweb: https://forums
 	* Setfire r s
 	* - Alters fire settings with radius shift (r) and red/yellow color shift (s)
 	*
-	* Flashlight on bl bw c bd
+	* Flashlight on bl bw c bd [t]
 	* - turn on flashlight for player with beam length (bl), beam width (hw), color (c),
-	*   and beam density (bd)
+	*   and beam density (bd) and optional type (t) where 0 = flashlight (default),
+	*   1 = conelight, and 2 = spotlight.
 	*
 	* Flashlight off
 	* - Turn off the flashlight.  yup.
