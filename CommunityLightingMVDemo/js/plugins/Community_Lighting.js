@@ -105,6 +105,12 @@ Imported[Community.Lighting.name] = true;
 * @desc Specify a key (<Key: Light 25 ...>) to be used with all note tags or leave blank for Terrax compatibility (Light 25 ...)
 * @default cl
 *
+* @param Sort Layer
+* @parent ---General Settings---
+* @desc There layer to add light mask at. -1 adds the mask as the top layer.
+* @type number
+* @default -1
+*
 * @param ---DayNight Settings---
 * @default
 *
@@ -1550,6 +1556,7 @@ class ColorDelta {
   let reset_each_map            = orBoolean(parameters['Reset Lights'], false);
   let noteTagKey                = parameters["Note Tag Key"] !== "" ? parameters["Note Tag Key"] : false;
   let dayNightSaveSeconds       = +parameters['Save DaynightSeconds'] || 0;
+  let sortLayer                 = +orNullish(parameters["Sort Layer"], -1);
   let dayNightSaveNight         = +parameters["Save Night Switch"] || 0;
   let dayNightNoAutoshadow      = orBoolean(parameters["No Autoshadow During Night"], false);
   let hideAutoShadow            = false;
@@ -2019,7 +2026,10 @@ class ColorDelta {
 
   Spriteset_Map.prototype.createLightmask = function () {
     this._lightmask = new Lightmask();
-    this.addChild(this._lightmask);
+    if (sortLayer >= 0)
+      this.addChildAt(this._lightmask, sortLayer);
+    else
+      this.addChild(this._lightmask);
   };
 
   function Lightmask() { this.initialize.apply(this, arguments); }
@@ -2877,7 +2887,10 @@ class ColorDelta {
     if ($gameVariables.GetScriptActive() && lightInBattle) {
       this._battleLightmask = new BattleLightmask();
       if (battleMaskPosition.equalsIC('Above')) {
-        this.addChild(this._battleLightmask);
+        if (sortLayer >= 0)
+          this.addChildAt(this._battleLightmask, sortLayer);
+        else
+          this.addChild(this._battleLightmask);
       } else if (battleMaskPosition.equalsIC('Between')) {
         this._battleField.addChild(this._battleLightmask);
       }
