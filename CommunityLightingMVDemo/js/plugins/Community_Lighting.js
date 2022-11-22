@@ -100,6 +100,12 @@ Imported[Community.Lighting.name] = true;
 * @desc Specify a key (<Key: Light 25 ...>) to be used with all note tags or leave blank for Terrax compatibility (Light 25 ...)
 * @default cl
 *
+* @param Sort Layer
+* @parent ---General Settings---
+* @desc There layer to add light mask at. -1 adds the mask as the top layer.
+* @type number
+* @default -1
+*
 * @param ---DayNight Settings---
 * @default
 *
@@ -612,6 +618,7 @@ Imported[Community.Lighting.name] = true;
   let dayNightSaveHours = Number(parameters['Save DaynightHours']) || 0;
   let dayNightSaveMinutes = Number(parameters['Save DaynightMinutes']) || 0;
   let dayNightSaveSeconds = Number(parameters['Save DaynightSeconds']) || 0;
+  let sortLayer = parameters["Sort Layer"] != null ? Number(parameters["Sort Layer"]) : -1;
   let dayNightSaveNight = Number(parameters["Save Night Switch"]) || 0;
   let dayNightNoAutoshadow = eval(parameters["No Autoshadow During Night"]) || false;
   let hideAutoShadow = false;
@@ -1102,7 +1109,10 @@ Imported[Community.Lighting.name] = true;
 
   Spriteset_Map.prototype.createLightmask = function () {
     this._lightmask = new Lightmask();
-    this.addChild(this._lightmask);
+		if (sortLayer >= 0)
+			this.addChildAt(this._lightmask, sortLayer);
+		else
+			this.addChild(this._lightmask);
   };
 
   function Lightmask() {
@@ -2213,7 +2223,10 @@ Imported[Community.Lighting.name] = true;
   Spriteset_Battle.prototype.createBattleback = function () {
     Community_Lighting_Spriteset_Battle_createBattleback.call(this);
     if (battleMaskPosition === 'Between') {
-      this.createBattleLightmask();
+      if (sortLayer >= 0)
+      this.addChildAt(this._battleLightmask, sortLayer);
+    else
+      this.addChild(this._battleLightmask);
     }
   };
 
